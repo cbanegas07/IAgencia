@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pidiendo la Intercesión de Guadalupe por Doña Jo</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&family=Raleway:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #f5ebe6 0%, #fdf8f5 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-family: 'Crimson Text', serif;
+            font-size: 2.2rem;
+            color: #e85d4e;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+        
+        .image-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .guadalupe-image {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 3px solid rgba(232, 93, 78, 0.2);
+        }
+        
+        .counter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .counter-label {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+        
+        .counter-number {
+            font-family: 'Crimson Text', serif;
+            font-size: 4rem;
+            color: #e85d4e;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        
+        .counter-number.updating {
+            transform: scale(1.1);
+            color: #4caf50;
+        }
+        
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .global-summary {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            background: #fff7f5;
+            box-shadow: inset 0 0 0 1px rgba(232, 93, 78, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .global-summary-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e85d4e;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .global-summary-number {
+            font-family: 'Crimson Text', serif;
+            font-size: 2.2rem;
+            color: #e85d4e;
+            font-weight: 600;
+        }
+        
+        .global-summary-note {
+            font-size: 0.85rem;
+            color: #777;
+            text-align: center;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .prayer-button {
+            background: #e85d4e;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(232, 93, 78, 0.3);
+            font-weight: 500;
+        }
+        
+        .prayer-button:hover:not(:disabled) {
+            background: #d64738;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 93, 78, 0.4);
+        }
+        
+        .prayer-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .prayer-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .prayer-text {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .prayer-title {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.8rem;
+            color: #e85d4e;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .prayer-content {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+            margin-bottom: 20px;
+        }
+        
+        .prayer-ending {
+            text-align: center;
+            font-weight: 500;
+            color: #666;
+            letter-spacing: 2px;
+            margin-top: 25px;
+            font-size: 0.95rem;
+        }
+        
+        .date-info {
+            text-align: center;
+            color: #e85d4e;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            font-weight: 500;
+        }
+        
+        .success-message.show {
+            transform: translateX(0);
+        }
+        
+        .connection-status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .connection-status.online {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .connection-status.offline {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .counter-number {
+                font-size: 3rem;
+            }
+            
+            .global-summary-number {
+                font-size: 1.8rem;
+            }
+            
+            .prayer-button {
+                padding: 12px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .guadalupe-image {
+                max-width: 250px;
+            }
+            
+            .success-message {
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100px);
+            }
+            
+            .success-message.show {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="connection-status" id="connectionStatus">
+            Conectando...
+        </div>
+        
+        <div class="header">
+            <h1>Pidiendo la Intercesión de Guadalupe por Doña Jo</h1>
+        </div>
+        
+        <div class="image-section">
+            <img src="data:image/jpeg;base64,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" alt="Beata Guadalupe Ortiz de Landázuri" class="guadalupe-image">
+        </div>
+        
+        <div class="counter-section">
+            <div class="counter-label">
+                Oraciones rezadas por Doña Jo
+                <span class="live-indicator"></span>
+            </div>
+            <div class="counter-number" id="counter" data-value="0">...</div>
+            <div class="global-summary" aria-live="polite">
+                <div class="global-summary-title">Conteo global acumulado</div>
+                <div class="global-summary-number" id="globalCounter">...</div>
+                <div class="global-summary-note">Se actualiza al instante después de cada aporte.</div>
+            </div>
+            <div class="button-group">
+                <button class="prayer-button" onclick="addPrayers(1)" id="btn1">+1</button>
+                <button class="prayer-button" onclick="addPrayers(2)" id="btn2">+2</button>
+                <button class="prayer-button" onclick="addPrayers(3)" id="btn3">+3</button>
+            </div>
+        </div>
+        
+        <div class="prayer-text">
+            <h2 class="prayer-title">ORACIÓN</h2>
+            <p class="prayer-content">
+                Dios Padre, concédeme, por intercesión de la beata Guadalupe, que sepa realizar como ella el trabajo ordinario con amor, y contagiar mi fe y alegría a todas las personas que me rodean, para que muchos más te conozcan y te amen. Dígnate otorgar la canonización de la beata Guadalupe, y concédeme por su intercesión el favor que te pido (pídase). Así sea.
+            </p>
+            <p class="prayer-ending">PADRENUESTRO, AVEMARÍA, GLORIA.</p>
+        </div>
+        
+        <div class="date-info">
+            Desarrollo: Carlos Espinoza
+        </div>
+    </div>
+    
+    <div class="success-message" id="successMessage">
+        ¡Oraciones añadidas! 🙏
+    </div>
+    
+    <script>
+        // CONFIGURACIÓN DE FIREBASE
+        // IMPORTANTE: Reemplaza estos valores con los de tu proyecto Firebase
+        const firebaseConfig = {
+            apiKey: "TU-API-KEY",
+            authDomain: "TU-AUTH-DOMAIN",
+            databaseURL: "TU-DATABASE-URL",
+            projectId: "TU-PROJECT-ID",
+            storageBucket: "TU-STORAGE-BUCKET",
+            messagingSenderId: "TU-MESSAGING-SENDER-ID",
+            appId: "TU-APP-ID"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const prayerCountRef = database.ref('prayerCount');
+        
+        let isConnected = false;
+        let isUpdating = false;
+        let persistedCount = 0;
+        
+        // Monitorear conexión
+        database.ref('.info/connected').on('value', (snapshot) => {
+            const status = document.getElementById('connectionStatus');
+            if (snapshot.val() === true) {
+                isConnected = true;
+                status.textContent = '🟢 En línea - Actualización en tiempo real';
+                status.className = 'connection-status online';
+                enableButtons();
+            } else {
+                isConnected = false;
+                status.textContent = '🔴 Sin conexión - Reconectando...';
+                status.className = 'connection-status offline';
+                disableButtons();
+            }
+        });
+        
+        // Escuchar cambios en tiempo real
+        prayerCountRef.on('value', (snapshot) => {
+            const count = snapshot.val() || 0;
+            updateDisplay(count);
+        });
+        
+        function updateDisplay(count, options = {}) {
+            const { animate = true, persist = true } = options;
+            const counter = document.getElementById('counter');
+            const globalCounter = document.getElementById('globalCounter');
+            const previous = parseInt(counter.getAttribute('data-value') || '0', 10);
+            
+            if (previous !== count) {
+                if (animate) {
+                    counter.classList.add('updating');
+                    setTimeout(() => {
+                        counter.classList.remove('updating');
+                    }, 500);
+                } else {
+                    counter.classList.remove('updating');
+                }
+            }
+            
+            counter.textContent = count.toLocaleString();
+            counter.setAttribute('data-value', count);
+            if (globalCounter) {
+                globalCounter.textContent = count.toLocaleString();
+            }
+            
+            if (persist) {
+                persistedCount = count;
+            }
+        }
+        
+        function addPrayers(count) {
+            if (!isConnected || isUpdating) return;
+            
+            isUpdating = true;
+            disableButtons();
+            
+            // Actualización optimista del conteo global
+            updateDisplay(persistedCount + count, { animate: false, persist: false });
+            
+            // Usar transacción para evitar conflictos
+            prayerCountRef.transaction((currentValue) => {
+                return (currentValue || 0) + count;
+            }, (error, committed, snapshot) => {
+                isUpdating = false;
+                enableButtons();
+                
+                if (error || !committed) {
+                    console.error('Error al actualizar:', error);
+                    updateDisplay(persistedCount, { animate: false, persist: false });
+                    showMessage('Error al actualizar. Intenta de nuevo.', 'error');
+                    return;
+                }
+                
+                const newCount = snapshot && typeof snapshot.val === 'function'
+                    ? snapshot.val()
+                    : persistedCount + count;
+                updateDisplay(newCount);
+                showSuccessMessage();
+            });
+        }
+        
+        function disableButtons() {
+            document.getElementById('btn1').disabled = true;
+            document.getElementById('btn2').disabled = true;
+            document.getElementById('btn3').disabled = true;
+        }
+        
+        function enableButtons() {
+            if (!isUpdating) {
+                document.getElementById('btn1').disabled = false;
+                document.getElementById('btn2').disabled = false;
+                document.getElementById('btn3').disabled = false;
+            }
+        }
+        
+        function showSuccessMessage() {
+            const message = document.getElementById('successMessage');
+            message.style.background = '#4caf50';
+            message.textContent = '¡Oraciones añadidas! 🙏';
+            message.classList.add('show');
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 2000);
+        }
+        
+        function showMessage(text, type) {
+            const message = document.getElementById('successMessage');
+            message.textContent = text;
+            if (type === 'error') {
+                message.style.background = '#f44336';
+            }
+            message.classList.add('show');
+            setTimeout(() => {
+                message.classList.remove('show');
+                message.style.background = '#4caf50';
+                message.textContent = '¡Oraciones añadidas! 🙏';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
